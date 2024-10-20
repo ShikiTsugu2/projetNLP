@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recherche d'articles</title>
+    <script>
+        async function performSearch() {
+            const query = document.getElementById('query').value;
+            const response = await fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: query })
+            });
+            const data = await response.json();
+            displayResults(data.results);
+        }
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+            results.forEach(result => {
+                const resultItem = document.createElement('div');
+                resultItem.innerHTML = `<h3>${highlightTerms(result.title, query)}</h3>`;
+                resultsContainer.appendChild(resultItem);
+            });
+        }
+
+        function highlightTerms(text, term) {
+            const regex = new RegExp(term, 'gi');
+            return text.replace(regex, match => `<span class="highlight">${match}</span>`);
+        }
+    </script>
+    <style>
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recherche d'articles</h1>
+    <input type="text" id="query" oninput="performSearch()" placeholder="Tapez votre recherche...">
+    <div id="results"></div>
+</body>
+</html>
